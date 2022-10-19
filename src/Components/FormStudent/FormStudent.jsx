@@ -1,14 +1,21 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { addStudent, editStudent } from "../redux/reducers/formStudentReducer";
+import {
+  addStudent,
+  saveStudent,
+  searchStudent,
+} from "../redux/reducers/formStudentReducer";
+
+const defaultStudent = {
+  id: "",
+  name: "",
+  phone: "",
+  email: "",
+};
+
 class FormStudent extends Component {
   state = {
-    values: {
-      id: "",
-      name: "",
-      phone: "",
-      email: "",
-    },
+    values: defaultStudent,
     errors: {
       id: "",
       name: "",
@@ -16,6 +23,9 @@ class FormStudent extends Component {
       email: "",
     },
     isSubmit: true,
+    isUpdate: true,
+    isID: false,
+    keySearch: null,
   };
   handleOnInput = (e) => {
     let { id, value } = e.target;
@@ -57,7 +67,10 @@ class FormStudent extends Component {
     newErrors[id] = messageError;
     let submit = false;
     for (let key in newValues) {
-      if (newValues[key].toString().trim() === "") {
+      if (
+        newValues[key].toString().trim() === "" ||
+        newErrors[key].toString().trim() !== ""
+      ) {
         submit = true;
       }
     }
@@ -67,17 +80,60 @@ class FormStudent extends Component {
       isSubmit: submit,
     });
   };
+
   handleSubmit = (e) => {
     e.preventDefault();
-    const action = addStudent(this.state.values);
-    // console.log(action);
-    this.props.dispatch(action);
-    this.props.dispatch(editStudent);
+    this.props.dispatch(addStudent(this.state.values));
+    this.setState({
+      values: defaultStudent,
+    });
   };
   handleUpdate = (e) => {
+    e.preventDefault();
+    this.props.dispatch(saveStudent(this.state.values));
   };
+  handleInput = (e) => {
+    const { value } = e.target;
+    this.setState(
+      {
+        keySearch: value,
+      },
+      () => {
+        this.props.dispatch(searchStudent(this.state.keySearch));
+      }
+    );
+  };
+  handleSearch = (e) => {
+    e.preventDefault();
+  };
+  componentDidMount() {
+    if (this.props.editStudent) {
+      this.setState({
+        values: this.props.editStudent,
+        isID: true,
+      });
+    } else {
+      this.setState({ values: defaultStudent });
+    }
+  }
+  componentDidUpdate(prevProps) {
+    if (prevProps.editStudent !== this.props.editStudent) {
+      if (this.props.editStudent) {
+        this.setState({
+          values: this.props.editStudent,
+          isUpdate: false,
+          isID: true,
+        });
+      } else {
+        this.setState({
+          values: defaultStudent,
+          isUpdate: false,
+        });
+      }
+    }
+  }
   render() {
-    // editStudent = this.props
+    const { listStudentSearch } = this.props;
     return (
       <div className="container">
         <form onSubmit={this.handleSubmit}>
@@ -99,6 +155,7 @@ class FormStudent extends Component {
                       name="id"
                       value={this.state.values.id}
                       onInput={this.handleOnInput}
+                      disabled={this.state.isID}
                     />
                     <p className="text-danger">{this.state.errors.id}</p>
                   </div>
@@ -155,15 +212,62 @@ class FormStudent extends Component {
           >
             Thêm sinh viên
           </button>
-          <button className="btn btn-primary mx-2 my-2" type="button" onClick={this.handleUpdate}>
+          <button
+            className="btn btn-primary mx-2 my-2"
+            type="button"
+            onClick={this.handleUpdate}
+            disabled={this.state.isUpdate}
+          >
             Cập nhật
           </button>
+          <div className="form-control">
+            <h3>Tìm kiếm sinh viên</h3>
+            <input
+              type="text"
+              className="form-control"
+              id="search"
+              name="search"
+              onChange={this.handleInput}
+            />
+            <button
+              type="button"
+              className="btn btn-success mt-2"
+              onClick={this.handleSearch}
+            >
+              Search
+            </button>
+            <hr />
+            <table className="table container py-4">
+              <thead>
+                <tr className="bg-dark text-light">
+                  <th>Mã sinh viên</th>
+                  <th>Họ tên</th>
+                  <th>Số điện thoại</th>
+                  <th>Email</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {listStudentSearch.map((student, index) => {
+                  return (
+                    <tr key={index}>
+                      <td>{student.id}</td>
+                      <td>{student.name}</td>
+                      <td>{student.phone}</td>
+                      <td>{student.email}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </form>
       </div>
     );
   }
 }
 const mapStateToProps = (state) => ({
-  editStudent: state.formStudentReducer.editStudent,
+  editStudent: state.formStudentReducer.student,
+  listStudentSearch: state.formStudentReducer.listStudentSearch,
 });
 export default connect(mapStateToProps)(FormStudent);

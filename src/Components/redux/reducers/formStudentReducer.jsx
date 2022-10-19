@@ -1,34 +1,49 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   listStudent: [],
-  editStudent: {},
+  student: null,
+  listStudentSearch: [],
 };
 
 const formStudentReducer = createSlice({
   name: "formStudentReducer",
   initialState,
   reducers: {
-    addStudent: (state, { type, payload }) => {
+    addStudent: (state, { payload }) => {
       state.listStudent = [...state.listStudent, payload];
     },
-    deleteStudent: (state, { type, payload }) => {
+    deleteStudent: (state, { payload }) => {
       const id = payload;
       state.listStudent = state.listStudent.filter(
         (student) => student.id !== id
       );
     },
-    editStudent: (state, { type, payload }) => {
-      console.log(payload);
-      const index = state.listStudent.findIndex(
-        (student) => student.id === payload.id
-      );
+    setEditStudent: (state, { payload }) => {
+      state.student = payload;
+    },
+    saveStudent: (state, { payload }) => {
+      const index = state.listStudent.findIndex((x) => x.id === payload.id);
       state.listStudent[index] = payload;
-      // return newState;
+    },
+    searchStudent: (state, { payload }) => {
+      const student = state.listStudent.filter(
+        (s) =>
+          s.id === payload ||
+          s.phone === payload ||
+          s.email === payload ||
+          s.name === payload
+      );
+      state.listStudentSearch = student;
     },
   },
 });
 
-export const { addStudent, deleteStudent, editStudent } =
-  formStudentReducer.actions;
+export const {
+  addStudent,
+  deleteStudent,
+  setEditStudent,
+  saveStudent,
+  searchStudent,
+} = formStudentReducer.actions;
 
 export default formStudentReducer.reducer;

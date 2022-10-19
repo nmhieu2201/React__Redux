@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
   deleteStudent,
-  editStudent,
+  setEditStudent,
 } from "../redux/reducers/formStudentReducer";
 class ListStudent extends Component {
   renderStudent = () => {
@@ -10,7 +10,7 @@ class ListStudent extends Component {
 
     return listStudent.map((student, index) => {
       return (
-        <tr key={index}>
+        <tr key={index} className="mt-3">
           <td>{student.id}</td>
           <td>{student.name}</td>
           <td>{student.phone}</td>
@@ -18,19 +18,13 @@ class ListStudent extends Component {
           <td>
             <button
               className="btn btn-danger mx-2"
-              onClick={() => {
-                const action = deleteStudent(student.id);
-                this.props.dispatch(action);
-              }}
+              onClick={() => this.props.dispatch(deleteStudent(student.id))}
             >
               Xoá
             </button>
             <button
               className="btn btn-primary"
-              onClick={() => {
-                const action = editStudent(student);
-                this.props.dispatch(action);
-              }}
+              onClick={() => this.props.dispatch(setEditStudent(student))}
             >
               Sửa
             </button>
@@ -41,18 +35,20 @@ class ListStudent extends Component {
   };
   render() {
     return (
-      <table className="table container py-4">
-        <thead>
-          <tr className="bg-dark text-light">
-            <th>Mã sinh viên</th>
-            <th>Họ tên</th>
-            <th>Số điện thoại</th>
-            <th>Email</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>{this.renderStudent()}</tbody>
-      </table>
+      <form className="container">
+        <table className="table container py-4">
+          <thead>
+            <tr className="bg-dark text-light">
+              <th>Mã sinh viên</th>
+              <th>Họ tên</th>
+              <th>Số điện thoại</th>
+              <th>Email</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>{this.renderStudent()}</tbody>
+        </table>
+      </form>
     );
   }
 }
