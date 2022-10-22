@@ -106,9 +106,15 @@ class FormStudent extends Component {
     } else {
       this.setState({ values: defaultStudent });
     }
-    let getStudentStore = JSON.parse(localStorage.getItem("listStudent"));
-    console.log(getStudentStore);
-    this.props.dispatch(getStore(getStudentStore));
+    if (localStorage.getItem("listStudent")) {
+      this.props.dispatch(
+        getStore(JSON.parse(localStorage.getItem("listStudent")))
+      );
+    } else {
+      this.props.dispatch(getStore([]));
+    }
+    // let getStudentStore = JSON.parse(localStorage.getItem("listStudent"));
+    // this.props.dispatch(getStore(getStudentStore));
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.editStudent !== this.props.editStudent) {
@@ -125,14 +131,7 @@ class FormStudent extends Component {
         });
       }
     }
-    // this.props.dispatch(
-    //   getStore(
-    //     localStorage.setItem(
-    //       "listStudent",
-    //       JSON.stringify(this.props.listStudent)
-    //     )
-    //   )
-    // );
+
     localStorage.setItem("listStudent", JSON.stringify(this.props.listStudent));
   }
 
