@@ -19,6 +19,7 @@ const formStudentReducer = createSlice({
       );
     },
     setEditStudent: (state, { payload }) => {
+      console.log("editStudent", payload);
       state.student = payload;
     },
     saveStudent: (state, { payload }) => {
@@ -35,6 +36,9 @@ const formStudentReducer = createSlice({
       );
       state.listStudentSearch = student;
     },
+    getStore: (state, { payload }) => {
+      state.listStudent = payload;
+    },
   },
 });
 
@@ -44,6 +48,8 @@ export const {
   setEditStudent,
   saveStudent,
   searchStudent,
+  saveStore,
+  getStore,
 } = formStudentReducer.actions;
 
 export default formStudentReducer.reducer;

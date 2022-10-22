@@ -7,7 +7,6 @@ import {
 class ListStudent extends Component {
   renderStudent = () => {
     const { listStudent } = this.props;
-
     return listStudent.map((student, index) => {
       return (
         <tr key={index} className="mt-3">
@@ -35,7 +34,6 @@ class ListStudent extends Component {
   };
   render() {
     return (
-      <form className="container">
         <table className="table container py-4">
           <thead>
             <tr className="bg-dark text-light">
@@ -48,7 +46,6 @@ class ListStudent extends Component {
           </thead>
           <tbody>{this.renderStudent()}</tbody>
         </table>
-      </form>
     );
   }
 }

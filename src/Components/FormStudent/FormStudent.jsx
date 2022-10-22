@@ -4,6 +4,7 @@ import {
   addStudent,
   saveStudent,
   searchStudent,
+  getStore,
 } from "../redux/reducers/formStudentReducer";
 
 const defaultStudent = {
@@ -58,7 +59,8 @@ class FormStudent extends Component {
         }
       }
       if (dataType === "name") {
-        let regexName = /^[a-zA-Z ]+$/;
+        let regexName =
+          /[^a-z0-9A-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễếệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]/;
         if (!regexName.test(value)) {
           messageError = id + " invalid format";
         }
@@ -92,17 +94,6 @@ class FormStudent extends Component {
     e.preventDefault();
     this.props.dispatch(saveStudent(this.state.values));
   };
-  handleInput = (e) => {
-    const { value } = e.target;
-    this.setState(
-      {
-        keySearch: value,
-      },
-      () => {
-        this.props.dispatch(searchStudent(this.state.keySearch));
-      }
-    );
-  };
   handleSearch = (e) => {
     e.preventDefault();
   };
@@ -115,8 +106,11 @@ class FormStudent extends Component {
     } else {
       this.setState({ values: defaultStudent });
     }
+    let getStudentStore = JSON.parse(localStorage.getItem("listStudent"));
+    console.log(getStudentStore);
+    this.props.dispatch(getStore(getStudentStore));
   }
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (prevProps.editStudent !== this.props.editStudent) {
       if (this.props.editStudent) {
         this.setState({
@@ -131,7 +125,24 @@ class FormStudent extends Component {
         });
       }
     }
+    // this.props.dispatch(
+    //   getStore(
+    //     localStorage.setItem(
+    //       "listStudent",
+    //       JSON.stringify(this.props.listStudent)
+    //     )
+    //   )
+    // );
+    localStorage.setItem("listStudent", JSON.stringify(this.props.listStudent));
   }
+
+  handleInputSearch = (e) => {
+    e.preventDefault();
+    const { value } = e.target;
+    this.setState({ keySearch: value }, () => {
+      this.props.dispatch(searchStudent(this.state.keySearch));
+    });
+  };
   render() {
     const { listStudentSearch } = this.props;
     return (
@@ -220,48 +231,48 @@ class FormStudent extends Component {
           >
             Cập nhật
           </button>
-          <div className="form-control">
-            <h3>Tìm kiếm sinh viên</h3>
-            <input
-              type="text"
-              className="form-control"
-              id="search"
-              name="search"
-              onChange={this.handleInput}
-            />
-            <button
-              type="button"
-              className="btn btn-success mt-2"
-              onClick={this.handleSearch}
-            >
-              Search
-            </button>
-            <hr />
-            <table className="table container py-4">
-              <thead>
-                <tr className="bg-dark text-light">
-                  <th>Mã sinh viên</th>
-                  <th>Họ tên</th>
-                  <th>Số điện thoại</th>
-                  <th>Email</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {listStudentSearch.map((student, index) => {
-                  return (
-                    <tr key={index}>
-                      <td>{student.id}</td>
-                      <td>{student.name}</td>
-                      <td>{student.phone}</td>
-                      <td>{student.email}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
         </form>
+        <div>
+          <h3>Tìm kiếm sinh viên</h3>
+          <input
+            type="text"
+            className="form-control"
+            id="search"
+            name="search"
+            onChange={this.handleInputSearch}
+          />
+          <button
+            type="button"
+            className="btn btn-success mt-2"
+            onClick={this.handleSearch}
+          >
+            Search
+          </button>
+          <hr />
+          {listStudentSearch.map((student, index) => {
+            return (
+              <table key={index} className="table container">
+                <thead>
+                  <tr className="bg-dark text-light">
+                    <th>Mã sinh viên</th>
+                    <th>Họ tên</th>
+                    <th>Số điện thoại</th>
+                    <th>Email</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr key={index}>
+                    <td>{student.id}</td>
+                    <td>{student.name}</td>
+                    <td>{student.phone}</td>
+                    <td>{student.email}</td>
+                  </tr>
+                </tbody>
+              </table>
+            );
+          })}
+        </div>
       </div>
     );
   }
@@ -269,5 +280,6 @@ class FormStudent extends Component {
 const mapStateToProps = (state) => ({
   editStudent: state.formStudentReducer.student,
   listStudentSearch: state.formStudentReducer.listStudentSearch,
+  listStudent: state.formStudentReducer.listStudent,
 });
 export default connect(mapStateToProps)(FormStudent);
