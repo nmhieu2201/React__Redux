@@ -17,14 +17,17 @@ const formStudentReducer = createSlice({
       state.listStudent = state.listStudent.filter(
         (student) => student.id !== id
       );
+      state.listStudentSearch = state.listStudentSearch.filter(
+        (st) => st.id !== id
+      );
     },
     setEditStudent: (state, { payload }) => {
-      console.log("editStudent", payload);
       state.student = payload;
     },
     saveStudent: (state, { payload }) => {
       const index = state.listStudent.findIndex((x) => x.id === payload.id);
       state.listStudent[index] = payload;
+      state.student = null;
     },
     searchStudent: (state, { payload }) => {
       const student = state.listStudent.filter(
